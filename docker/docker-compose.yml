@@ -1,0 +1,61 @@
+version: "3.4"
+
+services:
+  nginx:
+    container_name: nginx
+    image: nginx
+    ports:
+      - "80:80"
+    volumes:
+      - "/vagrant/nginx/conf.d:/etc/nginx/conf.d"
+      - "/vagrant/nginx/logs:/var/log/nginx"
+      - "/vagrant/www:/usr/share/www:rw"
+  php:
+    container_name: php
+    build:
+        context: ../php
+    ports:
+      - "9000:9000"
+      - "9501:9501"
+    volumes:
+      - "/vagrant/www:/usr/share/www:rw"
+      - "/vagrant/php/php/php.ini:/usr/local/etc/php/php.ini"
+      - "/vagrant/php/logs/:/var/log/"
+
+
+  apache1:
+    container_name: apache1
+    build:
+      context: ../apache
+    ports:
+      - "8080:80"
+      - "8443:443"
+    volumes:
+      - "/vagrant/www:/usr/share/www/"
+      - "/vagrant/apache/sites-enabled/:/etc/apache2/sites-enabled/"
+      - "/vagrant/apache/log/:/var/log/apache2/"
+  apache2:
+    container_name: apache2
+    build:
+      context: ../apache
+    ports:
+      - "8081:80"
+      - "8444:443"
+    volumes:
+      - "/vagrant/www:/usr/share/www/"
+      - "/vagrant/apache/sites-enabled/:/etc/apache2/sites-enabled/"
+      - "/vagrant/apache/log/:/var/log/apache2/"
+  mysql:
+    container_name: mysql
+    image: mysql:5
+    #restart: always
+    ports:
+      - "3306:3306"
+    volumes:
+      - "mysql:/var/lib/mysql"
+    environment:
+      MYSQL_ROOT_PASSWORD: wh10t#p
+
+
+volumes:
+  mysql:

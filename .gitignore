@@ -1,0 +1,4 @@
+*.box
+.idea
+.vagrant
+www
