@@ -2,3 +2,5 @@
 .idea
 .vagrant
 www
+apache/log/
+nginx/logs/

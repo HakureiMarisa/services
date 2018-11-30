@@ -21,8 +21,6 @@ services:
       - "/vagrant/www:/usr/share/www:rw"
       - "/vagrant/php/php/php.ini:/usr/local/etc/php/php.ini"
       - "/vagrant/php/logs/:/var/log/"
-
-
   apache1:
     container_name: apache1
     build:
@@ -48,7 +46,6 @@ services:
   mysql:
     container_name: mysql
     image: mysql:5
-    #restart: always
     ports:
       - "3306:3306"
     volumes:
