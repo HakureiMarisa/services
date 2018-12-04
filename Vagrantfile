@@ -25,24 +25,6 @@ Vagrant.configure("2") do |config|
   # NOTE: This will enable public access to the opened port
   # config.vm.network "forwarded_port", guest: 80, host: 8080
 
-   # if Vagrant::Util::Platform.windows? then
-   #     config.vm.network "forwarded_port", guest: 80, host: 80
-   #     config.vm.network "forwarded_port", guest: 443, host: 443
-   # else
-   #     # mac端口转发
-   #     config.trigger.after [:up] do |trigger|
-   #         trigger.run = {path: "./bin/port-redirect.sh"}
-   #     end
-   #     config.trigger.after [:halt, :destroy] do |trigger|
-   #         trigger.run = {path: "./bin/port-redirect-disable.sh"}
-   #     end
-#
-   #     config.vm.network "forwarded_port", guest: 80, host: 8080
-   #     config.vm.network "forwarded_port", guest: 443, host: 8443
-   # end
-#
-   # config.vm.network "forwarded_port", guest: 9501, host: 9501
-
   # Create a forwarded port mapping which allows access to a specific port
   # within the machine from a port on the host machine and only allow access
   # via 127.0.0.1 to disable public access
@@ -63,11 +45,6 @@ Vagrant.configure("2") do |config|
   # the path on the guest to mount the folder. And the optional third
   # argument is a set of non-required options.
   # config.vm.synced_folder "../data", "/vagrant_data"
-
-    config.vm.synced_folder "~/workspace", "/workspace", id: "vagrant-root",
-        owner: "vagrant",
-        group: "www-data",
-        mount_options: ["dmode=775,fmode=664"]
 
   # Provider-specific configuration so you can fine-tune various
   # backing providers for Vagrant. These expose provider-specific options.

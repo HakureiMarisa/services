@@ -6,8 +6,10 @@ services:
     image: nginx
     ports:
       - "80:80"
+      - "443:443"
     volumes:
       - "/vagrant/nginx/conf.d:/etc/nginx/conf.d"
+      - "/vagrant/ssl/:/etc/nginx/ssl/"
       - "/vagrant/nginx/logs:/var/log/nginx"
       - "/vagrant/www:/usr/share/www:rw"
   php:
@@ -31,6 +33,7 @@ services:
     volumes:
       - "/vagrant/www:/usr/share/www/"
       - "/vagrant/apache/sites-enabled/:/etc/apache2/sites-enabled/"
+      - "/vagrant/ssl/:/etc/apache2/ssl/"
       - "/vagrant/apache/log/:/var/log/apache2/"
   apache2:
     container_name: apache2
@@ -42,6 +45,7 @@ services:
     volumes:
       - "/vagrant/www:/usr/share/www/"
       - "/vagrant/apache/sites-enabled/:/etc/apache2/sites-enabled/"
+      - "/vagrant/ssl/:/etc/apache2/ssl/"
       - "/vagrant/apache/log/:/var/log/apache2/"
   mysql:
     container_name: mysql
