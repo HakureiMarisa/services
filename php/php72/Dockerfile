@@ -1,5 +1,7 @@
 FROM php:7.2-fpm
 
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+
 # 设置下载代理
 RUN pear config-set http_proxy "http://10.0.2.2:1087" \
     # 安装扩展
@@ -9,7 +11,11 @@ RUN pear config-set http_proxy "http://10.0.2.2:1087" \
 RUN pecl install swoole-4.2.1 \
     && docker-php-ext-enable swoole
 
-
 RUN docker-php-ext-install mysqli pdo pdo_mysql
 
-COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+RUN usermod -u 1000 www-data \
+    && groupmod -g 1000 www-data \
+    && chown www-data:www-data /usr/bin/composer \
+    && chown -R www-data:www-data /var/www/
+
+USER www-data:www-data

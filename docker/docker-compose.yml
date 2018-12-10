@@ -1,4 +1,4 @@
-version: "3.4"
+version: "3"
 
 services:
   nginx:
@@ -15,14 +15,16 @@ services:
   php:
     container_name: php
     build:
-        context: ../php
+        context: ../php/php72
     ports:
       - "9000:9000"
       - "9501:9501"
+    working_dir: "/usr/share/www"
     volumes:
       - "/vagrant/www:/usr/share/www:rw"
-      - "/vagrant/php/php/php.ini:/usr/local/etc/php/php.ini"
-      - "/vagrant/php/logs/:/var/log/"
+      - "/vagrant/php/php72/php/php.ini:/usr/local/etc/php/php.ini"
+      - "/vagrant/php/php72/php/conf.d/docker-php-ext-xdebug.ini:/usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini"
+      - "/vagrant/php/php72/logs/:/var/log/"
   apache1:
     container_name: apache1
     build:
