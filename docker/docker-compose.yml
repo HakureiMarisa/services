@@ -1,64 +1,95 @@
 version: "3"
 
 services:
+  dnsmasq:
+    container_name: dnsmasq
+    image: jpillora/dnsmasq:latest
+    ports:
+      - "53:53/udp"
+      - "5380:8080"
+    volumes:
+      - "/vagrant/dnsmasq/dnsmasq.d/:/etc/dnsmasq.d/"
+      - "/vagrant/dnsmasq/resolv.conf:/etc/resolv.conf"
+      - "/vagrant/dnsmasq/dnsmasq.conf:/etc/dnsmasq.conf"
+    networks:
+      frontend:
+        ipv4_address: 172.20.0.2
   nginx:
     container_name: nginx
     image: nginx
     ports:
       - "80:80"
+      - "8090:8090"
       - "443:443"
     volumes:
       - "/vagrant/nginx/conf.d:/etc/nginx/conf.d"
-      - "/vagrant/ssl/:/etc/nginx/ssl/"
-      - "/vagrant/nginx/logs:/var/log/nginx"
-      - "/vagrant/www:/usr/share/www:rw"
-  php:
-    container_name: php
+      - "/vagrant/nginx/ssl/:/etc/nginx/cert/"
+      - "logs:/var/log/nginx"
+      - "/vagrant/www/:/usr/share/www/"
+    labels:
+      aliyun.logs.stdout: stdout
+      aliyun.logs.access: /var/log/nginx/*.log
+  php70:
+    container_name: php70
     build:
-        context: ../php/php72
-    ports:
-      - "9000:9000"
-      - "9501:9501"
+        context: ../php/php70
     working_dir: "/usr/share/www"
     volumes:
-      - "/vagrant/www:/usr/share/www:rw"
-      - "/vagrant/php/php72/php/php.ini:/usr/local/etc/php/php.ini"
-      - "/vagrant/php/php72/php/conf.d/docker-php-ext-xdebug.ini:/usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini"
-      - "/vagrant/php/php72/logs/:/var/log/"
-  apache1:
-    container_name: apache1
-    build:
-      context: ../apache
+      - "/vagrant/www/:/usr/share/www/:rw"
+      - "/vagrant/php/php70/php/php.ini:/usr/local/etc/php/php.ini"
+      - "/vagrant/php/php70/php-fpm.d/zzz-www.conf:/usr/local/etc/php-fpm.d/zzz-www.conf"
+      - "~/.ssh/:/var/www/.ssh/"
+    extra_hosts:
+      - "controler1.srvmgr.service.58dns.org:192.168.67.230"
+      - "controler2.srvmgr.service.58dns.org:192.168.67.230"
+      - "controler3.srvmgr.service.58dns.org:192.168.67.230"
+      - "controler4.srvmgr.service.58dns.org:192.168.67.230"
+  php72:
+      tty: true
+      container_name: php72
+      build:
+          context: php/php72
+      working_dir: "/usr/share/www"
+      volumes:
+        - "/vagrant/www/:/usr/share/www/:rw"
+        - "/vagrant/docker/php/php72/php-fpm.d/www.conf:/etc/php/7.2/fpm/pool.d/www.conf"
+  redis:
+    container_name: redis
+    image: redis
     ports:
-      - "8080:80"
-      - "8443:443"
+      - "6379:6379"
     volumes:
-      - "/vagrant/www:/usr/share/www/"
-      - "/vagrant/apache/sites-enabled/:/etc/apache2/sites-enabled/"
-      - "/vagrant/ssl/:/etc/apache2/ssl/"
-      - "/vagrant/apache/log/:/var/log/apache2/"
-  apache2:
-    container_name: apache2
-    build:
-      context: ../apache
-    ports:
-      - "8081:80"
-      - "8444:443"
-    volumes:
-      - "/vagrant/www:/usr/share/www/"
-      - "/vagrant/apache/sites-enabled/:/etc/apache2/sites-enabled/"
-      - "/vagrant/ssl/:/etc/apache2/ssl/"
-      - "/vagrant/apache/log/:/var/log/apache2/"
+        - "/vagrant/redis/redis.conf:/usr/local/etc/redis/redis.conf"
   mysql:
     container_name: mysql
     image: mysql:5
     ports:
       - "3306:3306"
     volumes:
-      - "mysql:/var/lib/mysql"
+      - "storage:/var/lib/mysql"
     environment:
       MYSQL_ROOT_PASSWORD: wh10t#p
-
-
+  log-pilot:
+    image: registry.cn-hangzhou.aliyuncs.com/acs-sample/log-pilot
+    volumes:
+        - "/var/run/docker.sock:/var/run/docker.sock"
+        - "/:/host"
+    privileged: true
+networks:
+  frontend:
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
 volumes:
-  mysql:
+  logs:
+      driver: local
+      driver_opts:
+        type: none
+        device: /vagrant/logs
+        o: bind
+  storage:
+      driver: local
+      driver_opts:
+        type: none
+        device: /vagrant/logs
+        o: bind

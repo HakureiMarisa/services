@@ -3,9 +3,7 @@ FROM php:7.2-fpm
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 # 设置下载代理
-RUN pear config-set http_proxy "http://10.0.2.2:1087" \
-    # 安装扩展
-    && pecl install xdebug-2.6.0 \
+RUN pecl install xdebug-2.6.0 \
     && docker-php-ext-enable xdebug
 
 RUN pecl install swoole-4.2.1 \
@@ -13,9 +11,7 @@ RUN pecl install swoole-4.2.1 \
 
 RUN docker-php-ext-install mysqli pdo pdo_mysql
 
-RUN usermod -u 1000 www-data \
-    && groupmod -g 1000 www-data \
-    && chown www-data:www-data /usr/bin/composer \
-    && chown -R www-data:www-data /var/www/
+RUN pecl install redis \
+    && docker-php-ext-enable redis
 
 USER www-data:www-data

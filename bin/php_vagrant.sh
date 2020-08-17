@@ -1,1 +1,0 @@
-vagrant ssh -c "docker exec -it php php $@;";
