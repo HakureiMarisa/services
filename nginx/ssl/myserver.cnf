@@ -1,0 +1,667 @@
+#
+# OpenSSL example configuration file.
+# This is mostly being used for generation of certificate requests.
+#
+
+# This definition stops the following lines choking if HOME isn't
+# defined.
+HOME			= .
+RANDFILE		= $ENV::HOME/.rnd
+
+# Extra OBJECT IDENTIFIER info:
+#oid_file		= $ENV::HOME/.oid
+oid_section		= new_oids
+
+# To use this configuration file with the "-extfile" option of the
+# "openssl x509" utility, name here the section containing the
+# X.509v3 extensions to use:
+# extensions		= 
+# (Alternatively, use a configuration file that has only
+# X.509v3 extensions in its main [= default] section.)
+
+[ new_oids ]
+
+# We can add new OIDs in here for use by 'ca', 'req' and 'ts'.
+# Add a simple OID like this:
+# testoid1=1.2.3.4
+# Or use config file substitution like this:
+# testoid2=${testoid1}.5.6
+
+# Policies used by the TSA examples.
+tsa_policy1 = 1.2.3.4.1
+tsa_policy2 = 1.2.3.4.5.6
+tsa_policy3 = 1.2.3.4.5.7
+
+####################################################################
+[ ca ]
+default_ca	= CA_default		# The default ca section
+
+####################################################################
+[ CA_default ]
+
+dir		= /home/www/cert/my_ca		# Where everything is kept
+certs		= $dir/certs		# Where the issued certs are kept
+crl_dir		= $dir/crl		# Where the issued crl are kept
+database	= $dir/index.txt	# database index file.
+#unique_subject	= no			# Set to 'no' to allow creation of
+					# several ctificates with same subject.
+new_certs_dir	= $dir/newcerts		# default place for new certs.
+
+certificate	= $dir/cacert.pem 	# The CA certificate
+serial		= $dir/serial 		# The current serial number
+crlnumber	= $dir/crlnumber	# the current crl number
+					# must be commented out to leave a V1 CRL
+crl		= $dir/crl.pem 		# The current CRL
+private_key	= $dir/private/cakey.pem# The private key
+RANDFILE	= $dir/private/.rand	# private random number file
+
+x509_extensions	= usr_cert		# The extentions to add to the cert
+
+# Comment out the following two lines for the "traditional"
+# (and highly broken) format.
+name_opt 	= ca_default		# Subject Name options
+cert_opt 	= ca_default		# Certificate field options
+
+# Extension copying option: use with caution.
+# copy_extensions = copy
+
+# Extensions to add to a CRL. Note: Netscape communicator chokes on V2 CRLs
+# so this is commented out by default to leave a V1 CRL.
+# crlnumber must also be commented out to leave a V1 CRL.
+# crl_extensions	= crl_ext
+
+default_days	= 365			# how long to certify for
+default_crl_days= 30			# how long before next CRL
+default_md	= default		# use public key default MD
+preserve	= no			# keep passed DN ordering
+
+# A few difference way of specifying how similar the request should look
+# For type CA, the listed attributes must be the same, and the optional
+# and supplied fields are just that :-)
+policy		= policy_match
+
+# For the CA policy
+[ policy_match ]
+countryName		= match
+stateOrProvinceName	= match
+organizationName	= match
+organizationalUnitName	= optional
+commonName		= supplied
+emailAddress		= optional
+
+# For the 'anything' policy
+# At this point in time, you must list all acceptable 'object'
+# types.
+[ policy_anything ]
+countryName		= optional
+stateOrProvinceName	= optional
+localityName		= optional
+organizationName	= optional
+organizationalUnitName	= optional
+commonName		= supplied
+emailAddress		= optional
+
+####################################################################
+[ req ]
+default_bits		= 2048
+default_keyfile 	= privkey.pem
+distinguished_name	= req_distinguished_name
+attributes		= req_attributes
+x509_extensions	= v3_ca	# The extentions to add to the self signed cert
+
+# Passwords for private keys if not present they will be prompted for
+# input_password = secret
+# output_password = secret
+
+# This sets a mask for permitted string types. There are several options. 
+# default: PrintableString, T61String, BMPString.
+# pkix	 : PrintableString, BMPString (PKIX recommendation before 2004)
+# utf8only: only UTF8Strings (PKIX recommendation after 2004).
+# nombstr : PrintableString, T61String (no BMPStrings or UTF8Strings).
+# MASK:XXXX a literal mask value.
+# WARNING: ancient versions of Netscape crash on BMPStrings or UTF8Strings.
+string_mask = utf8only
+
+req_extensions = v3_req # The extensions to add to a certificate request
+
+[ req_distinguished_name ]
+countryName			= Country Name (2 letter code)
+countryName_default		= CN
+countryName_min			= 2
+countryName_max			= 2
+
+stateOrProvinceName		= State or Province Name (full name)
+stateOrProvinceName_default	= Shanghai
+
+localityName			= Locality Name (eg, city)
+localityName_default		= Shanghai
+
+organizationName		= Organization Name (eg, company)
+organizationName_default	= Anjuke
+
+# we can do this but it is not needed normally :-)
+#1.organizationName		= Second Organization Name (eg, company)
+#1.organizationName_default	= World Wide Web Pty Ltd
+
+organizationalUnitName		= Organizational Unit Name (eg, section)
+organizationalUnitName_default	= Mobile
+
+commonName			= Common Name (e.g. server FQDN or YOUR name)
+commonName_max			= 64
+commonName_default		= *.anjuke.test
+
+emailAddress			= Email Address
+emailAddress_max		= 64
+emailAddress_default		= bianwei02@58ganji.com
+
+# SET-ex3			= SET extension number 3
+
+[ req_attributes ]
+challengePassword		= A challenge password
+challengePassword_min		= 4
+challengePassword_max		= 20
+
+unstructuredName		= An optional company name
+
+[ usr_cert ]
+
+# These extensions are added when 'ca' signs a request.
+
+# This goes against PKIX guidelines but some CAs do it and some software
+# requires this to avoid interpreting an end user certificate as a CA.
+
+basicConstraints=CA:FALSE
+
+# Here are some examples of the usage of nsCertType. If it is omitted
+# the certificate can be used for anything *except* object signing.
+
+# This is OK for an SSL server.
+# nsCertType			= server
+
+# For an object signing certificate this would be used.
+# nsCertType = objsign
+
+# For normal client use this is typical
+# nsCertType = client, email
+
+# and for everything including object signing:
+# nsCertType = client, email, objsign
+
+# This is typical in keyUsage for a client certificate.
+# keyUsage = nonRepudiation, digitalSignature, keyEncipherment
+
+# This will be displayed in Netscape's comment listbox.
+nsComment			= "OpenSSL Generated Certificate"
+
+# PKIX recommendations harmless if included in all certificates.
+subjectKeyIdentifier=hash
+authorityKeyIdentifier=keyid,issuer
+
+# This stuff is for subjectAltName and issuerAltname.
+# Import the email address.
+# subjectAltName=email:copy
+# An alternative to produce certificates that aren't
+# deprecated according to PKIX.
+# subjectAltName=email:move
+
+# Copy subject details
+# issuerAltName=issuer:copy
+
+#nsCaRevocationUrl		= http://www.domain.dom/ca-crl.pem
+#nsBaseUrl
+#nsRevocationUrl
+#nsRenewalUrl
+#nsCaPolicyUrl
+#nsSslServerName
+
+# This is required for TSA certificates.
+# extendedKeyUsage = critical,timeStamping
+
+[ v3_req ]
+
+# Extensions to add to a certificate request
+
+basicConstraints = CA:FALSE
+keyUsage = nonRepudiation, digitalSignature, keyEncipherment
+subjectAltName = @alt_names
+
+[ alt_names ]
+DNS.1 = *.anjuke.test
+DNS.2 = *.anjuke.test
+DNS.3 = *.zu.anjuke.test
+DNS.4 = *.xzl.anjuke.test
+DNS.5 = *.sp.anjuke.test
+DNS.6 = *.fang.anjuke.test
+DNS.7 = *.m.jikejia.test
+DNS.8 = *.kfs.dev.anjuke.test
+DNS.9 = *.dev.anjuke.com
+DNS.10 = *.corp.anjuke.test
+DNS.11 = *.fp00.anjuke.test
+DNS.12 = *.fp01.anjuke.test
+DNS.13 = *.fp02.anjuke.test
+DNS.14 = *.fp03.anjuke.test
+DNS.15 = *.fp04.anjuke.test
+DNS.16 = *.fp05.anjuke.test
+DNS.17 = *.fp06.anjuke.test
+DNS.18 = *.fp07.anjuke.test
+DNS.19 = *.fp08.anjuke.test
+DNS.20 = *.fp09.anjuke.test
+DNS.21 = *.fp10.anjuke.test
+DNS.22 = *.fp11.anjuke.test
+DNS.23 = *.fp12.anjuke.test
+DNS.24 = *.fp13.anjuke.test
+DNS.25 = *.fp14.anjuke.test
+DNS.26 = *.fp15.anjuke.test
+DNS.27 = *.fp16.anjuke.test
+DNS.28 = *.fp17.anjuke.test
+DNS.29 = *.fp18.anjuke.test
+DNS.30 = *.fp19.anjuke.test
+DNS.31 = *.fp20.anjuke.test
+DNS.32 = *.fp21.anjuke.test
+DNS.33 = *.fp22.anjuke.test
+DNS.34 = *.fp23.anjuke.test
+DNS.35 = *.fp24.anjuke.test
+DNS.36 = *.fp25.anjuke.test
+DNS.37 = *.fp26.anjuke.test
+DNS.38 = *.fp27.anjuke.test
+DNS.39 = *.fp28.anjuke.test
+DNS.40 = *.fp29.anjuke.test
+DNS.41 = *.fp30.anjuke.test
+DNS.42 = *.fp31.anjuke.test
+DNS.43 = *.fp32.anjuke.test
+DNS.44 = *.fp33.anjuke.test
+DNS.45 = *.fp34.anjuke.test
+DNS.46 = *.fp35.anjuke.test
+DNS.47 = *.fp36.anjuke.test
+DNS.48 = *.fp37.anjuke.test
+DNS.49 = *.fp38.anjuke.test
+DNS.50 = *.fp39.anjuke.test
+DNS.51 = *.fp40.anjuke.test
+DNS.52 = *.fp41.anjuke.test
+DNS.53 = *.fp42.anjuke.test
+DNS.54 = *.fp43.anjuke.test
+DNS.55 = *.fp44.anjuke.test
+DNS.56 = *.fp45.anjuke.test
+DNS.57 = *.fp46.anjuke.test
+DNS.58 = *.fp47.anjuke.test
+DNS.59 = *.fp48.anjuke.test
+DNS.60 = *.fp49.anjuke.test
+DNS.61 = *.fp50.anjuke.test
+DNS.62 = *.fp51.anjuke.test
+DNS.63 = *.fp52.anjuke.test
+DNS.64 = *.fp53.anjuke.test
+DNS.65 = *.fp54.anjuke.test
+DNS.66 = *.fp55.anjuke.test
+DNS.67 = *.fp56.anjuke.test
+DNS.68 = *.fp57.anjuke.test
+DNS.69 = *.fp58.anjuke.test
+DNS.70 = *.fp59.anjuke.test
+DNS.71 = *.fp60.anjuke.test
+DNS.72 = *.fp61.anjuke.test
+DNS.73 = *.fp62.anjuke.test
+DNS.74 = *.fp63.anjuke.test
+DNS.75 = *.fp64.anjuke.test
+DNS.76 = *.fp65.anjuke.test
+DNS.77 = *.fp66.anjuke.test
+DNS.78 = *.fp67.anjuke.test
+DNS.79 = *.fp68.anjuke.test
+DNS.80 = *.fp69.anjuke.test
+DNS.81 = *.fp70.anjuke.test
+DNS.82 = *.fp71.anjuke.test
+DNS.83 = *.fp72.anjuke.test
+DNS.84 = *.fp73.anjuke.test
+DNS.85 = *.fp74.anjuke.test
+DNS.86 = *.fp75.anjuke.test
+DNS.87 = *.fp76.anjuke.test
+DNS.88 = *.fp77.anjuke.test
+DNS.89 = *.fp78.anjuke.test
+DNS.90 = *.fp79.anjuke.test
+DNS.91 = *.fp80.anjuke.test
+DNS.92 = *.fp81.anjuke.test
+DNS.93 = *.fp82.anjuke.test
+DNS.94 = *.fp83.anjuke.test
+DNS.95 = *.fp84.anjuke.test
+DNS.96 = *.fp85.anjuke.test
+DNS.97 = *.fp86.anjuke.test
+DNS.98 = *.fp87.anjuke.test
+DNS.99 = *.fp88.anjuke.test
+DNS.100 = *.fp89.anjuke.test
+DNS.101 = *.fp90.anjuke.test
+DNS.102 = *.fp91.anjuke.test
+DNS.103 = *.fp92.anjuke.test
+DNS.104 = *.fp93.anjuke.test
+DNS.105 = *.fp94.anjuke.test
+DNS.106 = *.fp95.anjuke.test
+DNS.107 = *.fp96.anjuke.test
+DNS.108 = *.fp97.anjuke.test
+DNS.109 = *.fp98.anjuke.test
+DNS.110 = *.fp99.anjuke.test
+DNS.111 = *.fp00.kfs.dev.anjuke.test
+DNS.112 = *.fp01.kfs.dev.anjuke.test
+DNS.113 = *.fp02.kfs.dev.anjuke.test
+DNS.114 = *.fp03.kfs.dev.anjuke.test
+DNS.115 = *.fp04.kfs.dev.anjuke.test
+DNS.116 = *.fp05.kfs.dev.anjuke.test
+DNS.117 = *.fp06.kfs.dev.anjuke.test
+DNS.118 = *.fp07.kfs.dev.anjuke.test
+DNS.119 = *.fp08.kfs.dev.anjuke.test
+DNS.120 = *.fp09.kfs.dev.anjuke.test
+DNS.121 = *.fp10.kfs.dev.anjuke.test
+DNS.122 = *.fp11.kfs.dev.anjuke.test
+DNS.123 = *.fp12.kfs.dev.anjuke.test
+DNS.124 = *.fp13.kfs.dev.anjuke.test
+DNS.125 = *.fp14.kfs.dev.anjuke.test
+DNS.126 = *.fp15.kfs.dev.anjuke.test
+DNS.127 = *.fp16.kfs.dev.anjuke.test
+DNS.128 = *.fp17.kfs.dev.anjuke.test
+DNS.129 = *.fp18.kfs.dev.anjuke.test
+DNS.130 = *.fp19.kfs.dev.anjuke.test
+DNS.131 = *.fp20.kfs.dev.anjuke.test
+DNS.132 = *.fp21.kfs.dev.anjuke.test
+DNS.133 = *.fp22.kfs.dev.anjuke.test
+DNS.134 = *.fp23.kfs.dev.anjuke.test
+DNS.135 = *.fp24.kfs.dev.anjuke.test
+DNS.136 = *.fp25.kfs.dev.anjuke.test
+DNS.137 = *.fp26.kfs.dev.anjuke.test
+DNS.138 = *.fp27.kfs.dev.anjuke.test
+DNS.139 = *.fp28.kfs.dev.anjuke.test
+DNS.140 = *.fp29.kfs.dev.anjuke.test
+DNS.141 = *.fp30.kfs.dev.anjuke.test
+DNS.142 = *.fp31.kfs.dev.anjuke.test
+DNS.143 = *.fp32.kfs.dev.anjuke.test
+DNS.144 = *.fp33.kfs.dev.anjuke.test
+DNS.145 = *.fp34.kfs.dev.anjuke.test
+DNS.146 = *.fp35.kfs.dev.anjuke.test
+DNS.147 = *.fp36.kfs.dev.anjuke.test
+DNS.148 = *.fp37.kfs.dev.anjuke.test
+DNS.149 = *.fp38.kfs.dev.anjuke.test
+DNS.150 = *.fp39.kfs.dev.anjuke.test
+DNS.151 = *.fp40.kfs.dev.anjuke.test
+DNS.152 = *.fp41.kfs.dev.anjuke.test
+DNS.153 = *.fp42.kfs.dev.anjuke.test
+DNS.154 = *.fp43.kfs.dev.anjuke.test
+DNS.155 = *.fp44.kfs.dev.anjuke.test
+DNS.156 = *.fp45.kfs.dev.anjuke.test
+DNS.157 = *.fp46.kfs.dev.anjuke.test
+DNS.158 = *.fp47.kfs.dev.anjuke.test
+DNS.159 = *.fp48.kfs.dev.anjuke.test
+DNS.160 = *.fp49.kfs.dev.anjuke.test
+DNS.161 = *.fp50.kfs.dev.anjuke.test
+DNS.162 = *.fp51.kfs.dev.anjuke.test
+DNS.163 = *.fp52.kfs.dev.anjuke.test
+DNS.164 = *.fp53.kfs.dev.anjuke.test
+DNS.165 = *.fp54.kfs.dev.anjuke.test
+DNS.166 = *.fp55.kfs.dev.anjuke.test
+DNS.167 = *.fp56.kfs.dev.anjuke.test
+DNS.168 = *.fp57.kfs.dev.anjuke.test
+DNS.169 = *.fp58.kfs.dev.anjuke.test
+DNS.170 = *.fp59.kfs.dev.anjuke.test
+DNS.171 = *.fp60.kfs.dev.anjuke.test
+DNS.172 = *.fp61.kfs.dev.anjuke.test
+DNS.173 = *.fp62.kfs.dev.anjuke.test
+DNS.174 = *.fp63.kfs.dev.anjuke.test
+DNS.175 = *.fp64.kfs.dev.anjuke.test
+DNS.176 = *.fp65.kfs.dev.anjuke.test
+DNS.177 = *.fp66.kfs.dev.anjuke.test
+DNS.178 = *.fp67.kfs.dev.anjuke.test
+DNS.179 = *.fp68.kfs.dev.anjuke.test
+DNS.180 = *.fp69.kfs.dev.anjuke.test
+DNS.181 = *.fp70.kfs.dev.anjuke.test
+DNS.182 = *.fp71.kfs.dev.anjuke.test
+DNS.183 = *.fp72.kfs.dev.anjuke.test
+DNS.184 = *.fp73.kfs.dev.anjuke.test
+DNS.185 = *.fp74.kfs.dev.anjuke.test
+DNS.186 = *.fp75.kfs.dev.anjuke.test
+DNS.187 = *.fp76.kfs.dev.anjuke.test
+DNS.188 = *.fp77.kfs.dev.anjuke.test
+DNS.189 = *.fp78.kfs.dev.anjuke.test
+DNS.190 = *.fp79.kfs.dev.anjuke.test
+DNS.191 = *.fp80.kfs.dev.anjuke.test
+DNS.192 = *.fp81.kfs.dev.anjuke.test
+DNS.193 = *.fp82.kfs.dev.anjuke.test
+DNS.194 = *.fp83.kfs.dev.anjuke.test
+DNS.195 = *.fp84.kfs.dev.anjuke.test
+DNS.196 = *.fp85.kfs.dev.anjuke.test
+DNS.197 = *.fp86.kfs.dev.anjuke.test
+DNS.198 = *.fp87.kfs.dev.anjuke.test
+DNS.199 = *.fp88.kfs.dev.anjuke.test
+DNS.200 = *.fp89.kfs.dev.anjuke.test
+DNS.201 = *.fp90.kfs.dev.anjuke.test
+DNS.202 = *.fp91.kfs.dev.anjuke.test
+DNS.203 = *.fp92.kfs.dev.anjuke.test
+DNS.204 = *.fp93.kfs.dev.anjuke.test
+DNS.205 = *.fp94.kfs.dev.anjuke.test
+DNS.206 = *.fp95.kfs.dev.anjuke.test
+DNS.207 = *.fp96.kfs.dev.anjuke.test
+DNS.208 = *.fp97.kfs.dev.anjuke.test
+DNS.209 = *.fp98.kfs.dev.anjuke.test
+DNS.210 = *.fp99.kfs.dev.anjuke.test
+DNS.211 = *.cmsfp00.kfs.dev.anjuke.test
+DNS.212 = *.cmsfp01.kfs.dev.anjuke.test
+DNS.213 = *.cmsfp02.kfs.dev.anjuke.test
+DNS.214 = *.cmsfp03.kfs.dev.anjuke.test
+DNS.215 = *.cmsfp04.kfs.dev.anjuke.test
+DNS.216 = *.cmsfp05.kfs.dev.anjuke.test
+DNS.217 = *.cmsfp06.kfs.dev.anjuke.test
+DNS.218 = *.cmsfp07.kfs.dev.anjuke.test
+DNS.219 = *.cmsfp08.kfs.dev.anjuke.test
+DNS.220 = *.cmsfp09.kfs.dev.anjuke.test
+DNS.221 = *.cmsfp10.kfs.dev.anjuke.test
+DNS.222 = *.cmsfp11.kfs.dev.anjuke.test
+DNS.223 = *.cmsfp12.kfs.dev.anjuke.test
+DNS.224 = *.cmsfp13.kfs.dev.anjuke.test
+DNS.225 = *.cmsfp14.kfs.dev.anjuke.test
+DNS.226 = *.cmsfp15.kfs.dev.anjuke.test
+DNS.227 = *.cmsfp16.kfs.dev.anjuke.test
+DNS.228 = *.cmsfp17.kfs.dev.anjuke.test
+DNS.229 = *.cmsfp18.kfs.dev.anjuke.test
+DNS.230 = *.cmsfp19.kfs.dev.anjuke.test
+DNS.231 = *.cmsfp20.kfs.dev.anjuke.test
+DNS.232 = *.cmsfp21.kfs.dev.anjuke.test
+DNS.233 = *.cmsfp22.kfs.dev.anjuke.test
+DNS.234 = *.cmsfp23.kfs.dev.anjuke.test
+DNS.235 = *.cmsfp24.kfs.dev.anjuke.test
+DNS.236 = *.cmsfp25.kfs.dev.anjuke.test
+DNS.237 = *.cmsfp26.kfs.dev.anjuke.test
+DNS.238 = *.cmsfp27.kfs.dev.anjuke.test
+DNS.239 = *.cmsfp28.kfs.dev.anjuke.test
+DNS.240 = *.cmsfp29.kfs.dev.anjuke.test
+DNS.241 = *.cmsfp30.kfs.dev.anjuke.test
+DNS.242 = *.cmsfp31.kfs.dev.anjuke.test
+DNS.243 = *.cmsfp32.kfs.dev.anjuke.test
+DNS.244 = *.cmsfp33.kfs.dev.anjuke.test
+DNS.245 = *.cmsfp34.kfs.dev.anjuke.test
+DNS.246 = *.cmsfp35.kfs.dev.anjuke.test
+DNS.247 = *.cmsfp36.kfs.dev.anjuke.test
+DNS.248 = *.cmsfp37.kfs.dev.anjuke.test
+DNS.249 = *.cmsfp38.kfs.dev.anjuke.test
+DNS.250 = *.cmsfp39.kfs.dev.anjuke.test
+DNS.251 = *.cmsfp40.kfs.dev.anjuke.test
+DNS.252 = *.cmsfp41.kfs.dev.anjuke.test
+DNS.253 = *.cmsfp42.kfs.dev.anjuke.test
+DNS.254 = *.cmsfp43.kfs.dev.anjuke.test
+DNS.255 = *.cmsfp44.kfs.dev.anjuke.test
+DNS.256 = *.cmsfp45.kfs.dev.anjuke.test
+DNS.257 = *.cmsfp46.kfs.dev.anjuke.test
+DNS.258 = *.cmsfp47.kfs.dev.anjuke.test
+DNS.259 = *.cmsfp48.kfs.dev.anjuke.test
+DNS.260 = *.cmsfp49.kfs.dev.anjuke.test
+DNS.261 = *.cmsfp50.kfs.dev.anjuke.test
+DNS.262 = *.cmsfp51.kfs.dev.anjuke.test
+DNS.263 = *.cmsfp52.kfs.dev.anjuke.test
+DNS.264 = *.cmsfp53.kfs.dev.anjuke.test
+DNS.265 = *.cmsfp54.kfs.dev.anjuke.test
+DNS.266 = *.cmsfp55.kfs.dev.anjuke.test
+DNS.267 = *.cmsfp56.kfs.dev.anjuke.test
+DNS.268 = *.cmsfp57.kfs.dev.anjuke.test
+DNS.269 = *.cmsfp58.kfs.dev.anjuke.test
+DNS.270 = *.cmsfp59.kfs.dev.anjuke.test
+DNS.271 = *.cmsfp60.kfs.dev.anjuke.test
+DNS.272 = *.cmsfp61.kfs.dev.anjuke.test
+DNS.273 = *.cmsfp62.kfs.dev.anjuke.test
+DNS.274 = *.cmsfp63.kfs.dev.anjuke.test
+DNS.275 = *.cmsfp64.kfs.dev.anjuke.test
+DNS.276 = *.cmsfp65.kfs.dev.anjuke.test
+DNS.277 = *.cmsfp66.kfs.dev.anjuke.test
+DNS.278 = *.cmsfp67.kfs.dev.anjuke.test
+DNS.279 = *.cmsfp68.kfs.dev.anjuke.test
+DNS.280 = *.cmsfp69.kfs.dev.anjuke.test
+DNS.281 = *.cmsfp70.kfs.dev.anjuke.test
+DNS.282 = *.cmsfp71.kfs.dev.anjuke.test
+DNS.283 = *.cmsfp72.kfs.dev.anjuke.test
+DNS.284 = *.cmsfp73.kfs.dev.anjuke.test
+DNS.285 = *.cmsfp74.kfs.dev.anjuke.test
+DNS.286 = *.cmsfp75.kfs.dev.anjuke.test
+DNS.287 = *.cmsfp76.kfs.dev.anjuke.test
+DNS.288 = *.cmsfp77.kfs.dev.anjuke.test
+DNS.289 = *.cmsfp78.kfs.dev.anjuke.test
+DNS.290 = *.cmsfp79.kfs.dev.anjuke.test
+DNS.291 = *.cmsfp80.kfs.dev.anjuke.test
+DNS.292 = *.cmsfp81.kfs.dev.anjuke.test
+DNS.293 = *.cmsfp82.kfs.dev.anjuke.test
+DNS.294 = *.cmsfp83.kfs.dev.anjuke.test
+DNS.295 = *.cmsfp84.kfs.dev.anjuke.test
+DNS.296 = *.cmsfp85.kfs.dev.anjuke.test
+DNS.297 = *.cmsfp86.kfs.dev.anjuke.test
+DNS.298 = *.cmsfp87.kfs.dev.anjuke.test
+DNS.299 = *.cmsfp88.kfs.dev.anjuke.test
+DNS.300 = *.cmsfp89.kfs.dev.anjuke.test
+DNS.301 = *.cmsfp90.kfs.dev.anjuke.test
+DNS.302 = *.cmsfp91.kfs.dev.anjuke.test
+DNS.303 = *.cmsfp92.kfs.dev.anjuke.test
+DNS.304 = *.cmsfp93.kfs.dev.anjuke.test
+DNS.305 = *.cmsfp94.kfs.dev.anjuke.test
+DNS.306 = *.cmsfp95.kfs.dev.anjuke.test
+DNS.307 = *.cmsfp96.kfs.dev.anjuke.test
+DNS.308 = *.cmsfp97.kfs.dev.anjuke.test
+DNS.309 = *.cmsfp98.kfs.dev.anjuke.test
+DNS.310 = *.cmsfp99.kfs.dev.anjuke.test
+DNS.311 = *.fp.front.anjuke.test
+
+[ v3_ca ]
+
+
+# Extensions for a typical CA
+
+
+# PKIX recommendation.
+
+subjectKeyIdentifier=hash
+
+authorityKeyIdentifier=keyid:always,issuer
+
+# This is what PKIX recommends but some broken software chokes on critical
+# extensions.
+#basicConstraints = critical,CA:true
+# So we do this instead.
+basicConstraints = CA:true
+
+# Key usage: this is typical for a CA certificate. However since it will
+# prevent it being used as an test self-signed certificate it is best
+# left out by default.
+# keyUsage = cRLSign, keyCertSign
+
+# Some might want this also
+# nsCertType = sslCA, emailCA
+
+# Include email address in subject alt name: another PKIX recommendation
+# subjectAltName=email:copy
+# Copy issuer details
+# issuerAltName=issuer:copy
+
+# DER hex encoding of an extension: beware experts only!
+# obj=DER:02:03
+# Where 'obj' is a standard or added object
+# You can even override a supported extension:
+# basicConstraints= critical, DER:30:03:01:01:FF
+
+[ crl_ext ]
+
+# CRL extensions.
+# Only issuerAltName and authorityKeyIdentifier make any sense in a CRL.
+
+# issuerAltName=issuer:copy
+authorityKeyIdentifier=keyid:always
+
+[ proxy_cert_ext ]
+# These extensions should be added when creating a proxy certificate
+
+# This goes against PKIX guidelines but some CAs do it and some software
+# requires this to avoid interpreting an end user certificate as a CA.
+
+basicConstraints=CA:FALSE
+
+# Here are some examples of the usage of nsCertType. If it is omitted
+# the certificate can be used for anything *except* object signing.
+
+# This is OK for an SSL server.
+# nsCertType			= server
+
+# For an object signing certificate this would be used.
+# nsCertType = objsign
+
+# For normal client use this is typical
+# nsCertType = client, email
+
+# and for everything including object signing:
+# nsCertType = client, email, objsign
+
+# This is typical in keyUsage for a client certificate.
+# keyUsage = nonRepudiation, digitalSignature, keyEncipherment
+
+# This will be displayed in Netscape's comment listbox.
+nsComment			= "OpenSSL Generated Certificate"
+
+# PKIX recommendations harmless if included in all certificates.
+subjectKeyIdentifier=hash
+authorityKeyIdentifier=keyid,issuer
+
+# This stuff is for subjectAltName and issuerAltname.
+# Import the email address.
+# subjectAltName=email:copy
+# An alternative to produce certificates that aren't
+# deprecated according to PKIX.
+# subjectAltName=email:move
+
+# Copy subject details
+# issuerAltName=issuer:copy
+
+#nsCaRevocationUrl		= http://www.domain.dom/ca-crl.pem
+#nsBaseUrl
+#nsRevocationUrl
+#nsRenewalUrl
+#nsCaPolicyUrl
+#nsSslServerName
+
+# This really needs to be in place for it to be a proxy certificate.
+proxyCertInfo=critical,language:id-ppl-anyLanguage,pathlen:3,policy:foo
+
+####################################################################
+[ tsa ]
+
+default_tsa = tsa_config1	# the default TSA section
+
+[ tsa_config1 ]
+
+# These are used by the TSA reply generation only.
+dir		= ./demoCA		# TSA root directory
+serial		= $dir/tsaserial	# The current serial number (mandatory)
+crypto_device	= builtin		# OpenSSL engine to use for signing
+signer_cert	= $dir/tsacert.pem 	# The TSA signing certificate
+					# (optional)
+certs		= $dir/cacert.pem	# Certificate chain to include in reply
+					# (optional)
+signer_key	= $dir/private/tsakey.pem # The TSA private key (optional)
+
+default_policy	= tsa_policy1		# Policy if request did not specify it
+					# (optional)
+other_policies	= tsa_policy2, tsa_policy3	# acceptable policies (optional)
+digests		= md5, sha1		# Acceptable message digests (mandatory)
+accuracy	= secs:1, millisecs:500, microsecs:100	# (optional)
+clock_precision_digits  = 0	# number of digits after dot. (optional)
+ordering		= yes	# Is ordering defined for timestamps?
+				# (optional, default: no)
+tsa_name		= yes	# Must the TSA name be included in the reply?
+				# (optional, default: no)
+ess_cert_id_chain	= no	# Must the ESS cert id chain be included?
+				# (optional, default: no)

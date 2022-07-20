@@ -23,36 +23,25 @@ services:
       - "443:443"
     volumes:
       - "/vagrant/nginx/conf.d:/etc/nginx/conf.d"
+      - "/vagrant/nginx/nginx.conf:/etc/nginx/nginx.conf"
       - "/vagrant/nginx/ssl/:/etc/nginx/cert/"
       - "logs:/var/log/nginx"
       - "/vagrant/www/:/usr/share/www/"
     labels:
       aliyun.logs.stdout: stdout
       aliyun.logs.access: /var/log/nginx/*.log
-  php70:
-    container_name: php70
-    build:
-        context: ../php/php70
-    working_dir: "/usr/share/www"
-    volumes:
-      - "/vagrant/www/:/usr/share/www/:rw"
-      - "/vagrant/php/php70/php/php.ini:/usr/local/etc/php/php.ini"
-      - "/vagrant/php/php70/php-fpm.d/zzz-www.conf:/usr/local/etc/php-fpm.d/zzz-www.conf"
-      - "~/.ssh/:/var/www/.ssh/"
-    extra_hosts:
-      - "controler1.srvmgr.service.58dns.org:192.168.67.230"
-      - "controler2.srvmgr.service.58dns.org:192.168.67.230"
-      - "controler3.srvmgr.service.58dns.org:192.168.67.230"
-      - "controler4.srvmgr.service.58dns.org:192.168.67.230"
   php72:
-      tty: true
       container_name: php72
       build:
           context: php/php72
       working_dir: "/usr/share/www"
       volumes:
-        - "/vagrant/www/:/usr/share/www/:rw"
+        - "/vagrant/www/:/usr/share/www/"
         - "/vagrant/docker/php/php72/php-fpm.d/www.conf:/etc/php/7.2/fpm/pool.d/www.conf"
+        - "/vagrant/docker/php/php72/php/php.ini:/etc/php/7.2/fpm/php.ini"
+      networks:
+        default:
+          ipv4_address: 172.18.0.8
   redis:
     container_name: redis
     image: redis
@@ -63,10 +52,11 @@ services:
   mysql:
     container_name: mysql
     image: mysql:5
+    user: 1000:1000
     ports:
       - "3306:3306"
     volumes:
-      - "storage:/var/lib/mysql"
+      - "/vagrant/storage/mysql:/var/lib/mysql"
     environment:
       MYSQL_ROOT_PASSWORD: wh10t#p
   log-pilot:
@@ -82,12 +72,6 @@ networks:
         - subnet: 172.20.0.0/16
 volumes:
   logs:
-      driver: local
-      driver_opts:
-        type: none
-        device: /vagrant/logs
-        o: bind
-  storage:
       driver: local
       driver_opts:
         type: none
