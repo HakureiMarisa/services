@@ -1,6 +1,12 @@
-#!/bin/bash
+#!/bin/sh
 
-sed -i 's/archive.ubuntu.com/mirrors.aliyun.com/g' /etc/apt/sources.list
-sed -i 's/security.ubuntu.com/mirrors.aliyun.com/g' /etc/apt/sources.list
+sudo sed -i 's/archive.ubuntu.com/mirrors.aliyun.com/g' /etc/apt/sources.list
+sudo sed -i 's/security.ubuntu.com/mirrors.aliyun.com/g' /etc/apt/sources.list
 
-/bin/bash
+sudo timedatectl set-timezone Asia/Shanghai
+
+sudo apt-get update
+sudo apt-get install -y bash-completion vim wget zip curl
+
+
+

@@ -1,17 +1,9 @@
 FROM ubuntu:18.04
 
-COPY ubuntu.sh /usr/bin/
+RUN sed -i 's/archive.ubuntu.com/mirrors.aliyun.com/g' /etc/apt/sources.list
+RUN sed -i 's/security.ubuntu.com/mirrors.aliyun.com/g' /etc/apt/sources.list
 
-RUN chmod +x /usr/bin/ubuntu.sh && sh /usr/bin/ubuntu.sh
-
-ENV TZ 'Asia/Shanghai'
-
-RUN echo $TZ > /etc/timezone \
-    && apt-get update && apt-get install -y tzdata language-pack-en-base \
-    && rm /etc/localtime \
-    && dpkg-reconfigure -f noninteractive tzdata \
-    && locale-gen en_US.UTF-8
-
-ENV LC_ALL en_US.UTF-8
-
-RUN apt-get install -y vim rsyslog wget zip curl
+RUN apt-get update && \
+    apt-get install -yq tzdata && \
+    ln -fs /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && \
+    dpkg-reconfigure -f noninteractive tzdata

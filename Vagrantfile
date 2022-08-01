@@ -46,6 +46,10 @@ Vagrant.configure("2") do |config|
   # argument is a set of non-required options.
   # config.vm.synced_folder "../data", "/vagrant_data"
   # config.vm.synced_folder ".", "/vagrant", type: "nfs", :mount_options => ['nolock,vers=3,udp,noatime,actimeo=1']
+  config.vm.synced_folder '.', '/vagrant', disabled: true
+  config.vm.synced_folder '..', '/vagrant', type: "nfs"
+  config.vm.synced_folder '/etc', '/opt/etc'
+  # config.vm.synced_folder '~/.ssh', '/home/vagrant/.ssh', owner: 'vagrant', group: 'vagrant'
 
   # Provider-specific configuration so you can fine-tune various
   # backing providers for Vagrant. These expose provider-specific options.
@@ -71,6 +75,48 @@ Vagrant.configure("2") do |config|
         vb.memory = "4096"
     end
 
+
+  # 设置vbguest不自动更新
+  config.vbguest.auto_update = false
+
+  # 激活hostmanager插件
+  config.hostmanager.enabled = true
+
+  # 在各自虚拟机中添加各虚拟机的主机名解析信息
+  config.hostmanager.manage_guest = true
+
+  # 不忽略私有网络的地址
+  config.hostmanager.ignore_private_ip = false
+
+  # config.vm.define 'vm1' do |node|
+  #   node.vm.hostname = 'vm1'
+  #   node.vm.network :private_network, ip: '192.168.42.42'
+  # end
+
+  config.ssh.forward_agent = true
+  # config.ssh.private_key_path = '~/.ssh/id_rsa'
+  private_key_path = File.join(Dir.home, ".ssh", "id_rsa")
+  public_key_path = File.join(Dir.home, ".ssh", "id_rsa.pub")
+  insecure_key_path = File.join(Dir.home, ".vagrant.d", "insecure_private_key")
+
+  private_key = IO.read(private_key_path)
+  public_key = IO.read(public_key_path)
+  # config.ssh.insert_key = false
+  # config.ssh.private_key_path = [
+  #   private_key_path,
+  #   insecure_key_path # to provision the first time
+  # ]
+
+  # config.vm.provision :shell, :inline => <<-SCRIPT
+  #   set -e
+
+  #   # echo '#{private_key}' > /home/vagrant/.ssh/id_rsa
+  #   # chmod 600 /home/vagrant/.ssh/id_rsa
+
+  #   echo '#{public_key}' > /home/vagrant/.ssh/authorized_keys
+  #   chmod 600 /home/vagrant/.ssh/authorized_keys
+  # SCRIPT
+
   # Enable provisioning with a shell script. Additional provisioners such as
   # Puppet, Chef, Ansible, Salt, and Docker are also available. Please see the
   # documentation for more information about their specific syntax and use.
@@ -80,4 +126,5 @@ Vagrant.configure("2") do |config|
   # SHELL
   # config.vm.provision :shell, path: "bootstrap.sh", run: "always"
     config.vm.provision :shell, path: "bin/bootstrap.sh", run: "always"
+    # config.vm.provision "file", source: "~/.ssh", destination: "$HOME/.ssh"
 end
