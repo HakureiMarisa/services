@@ -1,9 +1,0 @@
-2020/12/10 01:46:09 [emerg] 1#1: host not found in upstream "php72:9000" in /etc/nginx/conf.d/0-upstream.conf:3
-2020/12/24 10:06:38 [emerg] 1#1: "stream" directive is not allowed here in /etc/nginx/conf.d/0-upstream.conf:8
-2020/12/24 10:12:04 [emerg] 1#1: bind() to 0.0.0.0:80 failed (98: Address already in use)
-2020/12/24 10:12:04 [emerg] 1#1: bind() to 0.0.0.0:80 failed (98: Address already in use)
-2020/12/24 10:12:04 [emerg] 1#1: bind() to 0.0.0.0:80 failed (98: Address already in use)
-2020/12/24 10:12:04 [emerg] 1#1: bind() to 0.0.0.0:80 failed (98: Address already in use)
-2020/12/24 10:12:04 [emerg] 1#1: bind() to 0.0.0.0:80 failed (98: Address already in use)
-2020/12/24 10:12:04 [emerg] 1#1: still could not bind()
-2022/07/20 00:41:33 [emerg] 1#1: host not found in upstream "php72:9000" in /etc/nginx/conf.d/0-upstream.conf:3

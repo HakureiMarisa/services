@@ -39,45 +39,48 @@ services:
         - "/vagrant/:/usr/share/www/"
         - "./php/php80/php-fpm.d/www.conf:/etc/php/8.0/fpm/pool.d/www.conf"
         - "./php/php80/php/php.ini:/etc/php/8.0/fpm/php.ini"
-  redis:
-    container_name: redis
-    image: redis
-    ports:
-      - "6379:6379"
-    volumes:
-        - "../redis/redis.conf:/usr/local/etc/redis/redis.conf"
-  redis-stat:
-    image: insready/redis-stat
-    ports:
-      - "63790:63790"
-    command: --server redis
-  rabbitmq:
-    container_name: rabbitmq
-    build:
-        context: rabbitmq
-    ports:
-      - "5672:5672"
-      - "15672:15672"
-  mysql:
-    container_name: mysql
-    image: mysql:8
-    user: 1000:1000
-    command: --innodb-use-native-aio=0
-    ports:
-      - "3306:3306"
-    volumes:
-      - "../storage/mysql8:/var/lib/mysql"
-    environment:
-      MYSQL_ROOT_PASSWORD: wh10t#p
-  log-pilot:
-    image: registry.cn-hangzhou.aliyuncs.com/acs-sample/log-pilot
-    volumes:
-        - "/var/run/docker.sock:/var/run/docker.sock"
-        - "/:/host"
-    privileged: true
+  # redis:
+  #   container_name: redis
+  #   image: redis
+  #   ports:
+  #     - "6379:6379"
+  #   volumes:
+  #       - "../redis/redis.conf:/usr/local/etc/redis/redis.conf"
+  # redis-stat:
+  #   image: insready/redis-stat
+  #   ports:
+  #     - "63790:63790"
+  #   command: --server redis
+  # rabbitmq:
+  #   container_name: rabbitmq
+  #   build:
+  #       context: rabbitmq
+  #   ports:
+  #     - "5672:5672"
+  #     - "15672:15672"
+  # mysql:
+  #   container_name: mysql
+  #   image: mysql:8
+  #   user: 1000:1000
+  #   command: --innodb-use-native-aio=0
+  #   ports:
+  #     - "3306:3306"
+  #   volumes:
+  #     - "../storage/mysql8:/var/lib/mysql"
+  #     - "./mysql/conf.d/docker.conf:/etc/mysql/conf.d/docker.cnf"
+  #   environment:
+  #     MYSQL_ROOT_PASSWORD: wh10t#p
+  # log-pilot:
+  #   image: registry.cn-hangzhou.aliyuncs.com/acs-sample/log-pilot
+  #   volumes:
+  #       - "/var/run/docker.sock:/var/run/docker.sock"
+  #       - "/:/host"
+  #   privileged: true
   go:
     container_name: go
-    image: golang:1.19-rc
+    image: golang:1.18
+    tty: true
+    privileged: true
     # ports:
     #   - "6379:6379"
     # environment:
@@ -90,7 +93,7 @@ services:
     #   - git config --global url."https://$USERNAME:$ACCESS_TOKEN@codeup.aliyun.com".insteadOf "https://codeup.aliyun.com"
     volumes:
         - "/vagrant:/go"
-        - "~/.ssh:/root/.ssh:Z"
+        - "/opt/.ssh:/tmp/.ssh:z"
 networks:
   frontend:
     ipam:
