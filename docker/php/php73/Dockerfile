@@ -1,4 +1,4 @@
-FROM docker_ubuntu
+FROM docker-ubuntu
 
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
@@ -9,8 +9,11 @@ RUN apt-get update && apt-get install -y software-properties-common git \
 
 RUN apt-get update && apt install -y vim zip curl wget
 
-RUN apt-get update \
-    && apt-get install -y php7.3-dev php7.3-cli php7.3-fpm \
+RUN apt install ca-certificates \
+    && sed -i "s@http://mirrors.tuna.tsinghua.edu.cn@https://mirrors.tuna.tsinghua.edu.cn@g" /etc/apt/sources.list \
+    && sed -i "s@http://mirrors.tuna.tsinghua.edu.cn@https://mirrors.tuna.tsinghua.edu.cn@g" /etc/apt/sources.list \
+    && apt update \
+    && apt install -y php7.3-dev php7.3-cli php7.3-fpm \
         php7.3-mysql php7.3-curl php7.3-json php7.3-mbstring php7.3-xml php7.3-intl \
         php7.3-gd php7.3-gmp php7.3-curl php7.3-zip php7.3-soap php7.3-bz2 php7.3-bcmath \
         php7.3-redis php7.3-apcu \

@@ -12,7 +12,7 @@ Vagrant.configure("2") do |config|
 
   # Every Vagrant development environment requires a box. You can search for
   # boxes at https://vagrantcloud.com/search.
-  config.vm.box = "ubuntu/bionic"
+  config.vm.box = "ubuntu/1804"
 
   # Disable automatic box update checking. If you disable this, then
   # boxes will only be checked for updates when the user runs
@@ -32,8 +32,7 @@ Vagrant.configure("2") do |config|
 
   # Create a private network, which allows host-only access to the machine
   # using a specific IP.
-  # config.vm.network "private_network", ip: "192.168.33.10"
-  config.vm.network "private_network", ip: "192.168.33.10"
+  # config.vm.network "private_network", ip: "192.168.56.10"
 
   # Create a public network, which generally matched to bridged network.
   # Bridged networks make the machine appear as another physical device on
@@ -46,10 +45,10 @@ Vagrant.configure("2") do |config|
   # argument is a set of non-required options.
   # config.vm.synced_folder "../data", "/vagrant_data"
   # config.vm.synced_folder ".", "/vagrant", type: "nfs", :mount_options => ['nolock,vers=3,udp,noatime,actimeo=1']
-  config.vm.synced_folder '.', '/vagrant', disabled: true
-  config.vm.synced_folder '..', '/vagrant', nfs: true, mount_options: ['actimeo=2']
-  config.vm.synced_folder '/etc', '/opt/etc'
-  config.vm.synced_folder '~/.ssh', '/opt/.ssh'
+  # config.vm.synced_folder '.', '/vagrant', disabled: true
+  # config.vm.synced_folder '..', '/vagrant', nfs: true, mount_options: ['actimeo=2']
+  # config.vm.synced_folder '/etc', '/opt/etc'
+  # config.vm.synced_folder '~/.ssh', '/opt/.ssh'
 
   # Provider-specific configuration so you can fine-tune various
   # backing providers for Vagrant. These expose provider-specific options.
@@ -67,18 +66,18 @@ Vagrant.configure("2") do |config|
   # information on available options.
     config.vm.provider "virtualbox" do |vb|
         # Display the VirtualBox GUI when booting the machine
-        # vb.gui = true
+        vb.gui = false
 
         # Customize the amount of memory on the VM:
         # vb.memory = "1024"
-        vb.customize ["modifyvm", :id, "--cableconnected1", "on", "--accelerate3d", "on"]
-        vb.memory = "2048"
+        # vb.customize ["modifyvm", :id, "--cableconnected1", "on", "--accelerate3d", "on"]
+        vb.memory = "4096"
     end
 
 
   # 设置vbguest不自动更新
-  config.vbguest.auto_update = false
-  config.ssh.forward_agent = true
+  # config.vbguest.auto_update = false
+  # config.ssh.forward_agent = true
 
   # config.vm.provision :shell, :inline => <<-SCRIPT
   #   set -e
@@ -98,6 +97,6 @@ Vagrant.configure("2") do |config|
   #   apt-get install -y apache2
   # SHELL
   # config.vm.provision :shell, path: "bootstrap.sh", run: "always"
-    config.vm.provision :shell, path: "bin/bootstrap.sh", run: "always"
+    # config.vm.provision :shell, path: "bin/bootstrap.sh", run: "always"
     # config.vm.provision "file", source: "~/.ssh", destination: "$HOME/.ssh"
 end
